@@ -14,11 +14,11 @@ import { Component } from '@angular/core';
       (change)="onFileSelected($event)"
       hidden
     />
+    <p>{{ audioUrl }}</p>
 
-    <audio *ngIf="audioUrl" controls>
+    <audio controls>
       <source [src]="audioUrl" type="audio/wav" />
-      Your browser does not support the audio element.
-    </audio>    
+    </audio>  
   `,
   styleUrl: './song.css',
 })
@@ -48,8 +48,8 @@ export class Song {
     this.http.post('http://localhost:8080/upload', formData, {
       responseType: 'text'
     }).subscribe((response: string) => {
-      // backend returns file URL
+      console.log("SETTING AUDIO URL:", response);
       this.audioUrl = response;
-    });
-  }
+    });  
+}
 }
