@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
+
+
 
 @Component({
   selector: 'app-song',
@@ -15,21 +17,40 @@ import { CommonModule } from '@angular/common';
       (change)="onFileSelected($event)"
       hidden
     />
-    <p>{{ audioUrl }}</p>
-    @if (audioUrl) {
-   <audio controls>
-      <source [src]="audioUrl" type="audio/wav" />
-      Your browser does not support the audio element.
-    </audio>  
-    }  
+    <h3>Uploaded Songs</h3>
+    
+    @for(song of songs; track song) {
+      <div>
+          <p>{{ song }}</p>
+          <audio [src]="getAudioUrl(song)" controls></audio>
+      </div>
+    }
     `,
   styleUrl: './song.css',
 })
 export class Song {
-    selectedFile: File | null = null;
+  
+  songs: string[] = [];
+
+  ngOnInit() {
+    this.loadSongs();
+  }
+
+  loadSongs() {
+    this.http.get<string[]>('http://localhost:8080/audio')
+      .subscribe(data => {
+        this.songs = data;
+      });
+  }  
+
+  selectedFile: File | null = null;
   audioUrl: string | null = null;
 
   constructor(private http: HttpClient) {}
+
+  getAudioUrl(filename: string): string {
+  return `http://localhost:8080/audio/${filename}`;
+  }
 
   onFileSelected(event: any) {
     const file = event.target.files[0];
@@ -53,6 +74,28 @@ export class Song {
     }).subscribe((response: string) => {
       console.log("SETTING AUDIO URL:", response);
       this.audioUrl = response;
-    });  
-}
+    });
+
+    this.loadSongs();
+  }
+
+  getFile() {
+    // check if silectedFile is set to a value
+    if (!this.selectedFile) return;
+
+    
+    const formData = new FormData();
+    formData.append('file', this.selectedFile);
+
+
+
+    // Copy-pasta
+    this.http.post('http://localhost:8080/upload', formData, {
+      responseType: 'text'
+    }).subscribe((response: string) => {
+      console.log("SETTING AUDIO URL:", response);
+      this.audioUrl = response;
+    })
+
+  }
 }
