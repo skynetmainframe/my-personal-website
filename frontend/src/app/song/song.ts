@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-song',
@@ -15,11 +16,13 @@ import { Component } from '@angular/core';
       hidden
     />
     <p>{{ audioUrl }}</p>
-
-    <audio controls>
+    @if (audioUrl) {
+   <audio controls>
       <source [src]="audioUrl" type="audio/wav" />
+      Your browser does not support the audio element.
     </audio>  
-  `,
+    }  
+    `,
   styleUrl: './song.css',
 })
 export class Song {
