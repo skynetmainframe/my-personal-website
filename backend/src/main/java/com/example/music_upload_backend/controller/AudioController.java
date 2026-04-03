@@ -41,7 +41,10 @@ public class AudioController {
 
         File[] files = folder.listFiles();
 
+        System.out.println("Files found: " + (files == null ? "null" : files.length));
+
         if (files == null) {
+            
             return List.of();
         }
 

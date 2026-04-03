@@ -9,14 +9,7 @@ import { Component } from '@angular/core';
   imports: [],
   template: `
     <h2> Song Component </h2>
-    <button (click)="fileInput.click()">Upload song</button>
-    <input
-      type="file"
-      #fileInput
-      accept=".wav"
-      (change)="onFileSelected($event)"
-      hidden
-    />
+
     <h3>Uploaded Songs</h3>
     
     @for(song of songs; track song) {
@@ -25,22 +18,36 @@ import { Component } from '@angular/core';
           <audio [src]="getAudioUrl(song)" controls></audio>
       </div>
     }
+    <button (click)="fileInput.click()">Upload song</button>
+    <input
+      type="file"
+      #fileInput
+      accept=".wav"
+      (change)="onFileSelected($event)"
+      hidden
+    />
+
     `,
   styleUrl: './song.css',
 })
 export class Song {
   
   songs: string[] = [];
+  
 
   ngOnInit() {
+    console.log("Starting ngOnit()...")
     this.loadSongs();
   }
 
   loadSongs() {
+   
     this.http.get<string[]>('http://localhost:8080/audio')
       .subscribe(data => {
         this.songs = data;
+        console.log("Songs as JSON: ", this.songs);
       });
+    
   }  
 
   selectedFile: File | null = null;
@@ -49,6 +56,8 @@ export class Song {
   constructor(private http: HttpClient) {}
 
   getAudioUrl(filename: string): string {
+  console.log("Starting getAudioUrl", filename);
+
   return `http://localhost:8080/audio/${filename}`;
   }
 
@@ -79,23 +88,22 @@ export class Song {
     this.loadSongs();
   }
 
-  getFile() {
-    // check if silectedFile is set to a value
-    if (!this.selectedFile) return;
+  // getFile() {
+  //   // check if silectedFile is set to a value
+  //   if (!this.selectedFile) return;
 
     
-    const formData = new FormData();
-    formData.append('file', this.selectedFile);
+  //   const formData = new FormData();
+  //   formData.append('file', this.selectedFile);
 
 
 
-    // Copy-pasta
-    this.http.post('http://localhost:8080/upload', formData, {
-      responseType: 'text'
-    }).subscribe((response: string) => {
-      console.log("SETTING AUDIO URL:", response);
-      this.audioUrl = response;
-    })
+  //   // Copy-pasta
+  //   this.http.post('http://localhost:8080/upload', formData, {
+  //     responseType: 'text'
+  //   }).subscribe((response: string) => {
+  //     console.log("SETTING AUDIO URL:", response);
+  //     this.audioUrl = response;
+  //   })
 
-  }
 }
