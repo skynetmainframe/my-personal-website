@@ -12,10 +12,18 @@ import { Component } from '@angular/core';
 
     <h3>Uploaded Songs</h3>
     
-    @for(song of songs; track song) {
-      <div>
-          <p>{{ song }}</p>
-          <audio [src]="getAudioUrl(song)" controls></audio>
+    @for (song of songs; track song) {
+      <div style="margin-bottom: 10px;">
+        <p>{{ song }}</p>
+
+        <audio
+          #player
+          [src]="getAudioUrl(song)"
+          controls
+          (play)="onPlay(player)"
+          (pause)="onPause(player)"
+          (ended)="onEnded(player)">
+        </audio>
       </div>
     }
     <button (click)="fileInput.click()">Upload song</button>
@@ -25,7 +33,7 @@ import { Component } from '@angular/core';
       accept=".wav"
       (change)="onFileSelected($event)"
       hidden
-    />
+    /> 
 
     `,
   styleUrl: './song.css',
@@ -33,7 +41,31 @@ import { Component } from '@angular/core';
 export class Song {
   
   songs: string[] = [];
-  
+  currentAudio: HTMLAudioElement | null = null;
+
+  onPlay(audio: HTMLAudioElement) {
+
+    // If another audio is playing → stop it
+    if (this.currentAudio && this.currentAudio !== audio) {
+      this.currentAudio.pause();
+      this.currentAudio.currentTime = 0;
+    }
+
+    // Set new current audio
+    this.currentAudio = audio;
+  }
+
+  onPause(audio: HTMLAudioElement) {
+    if (this.currentAudio === audio) {
+      this.currentAudio = null;
+    }
+  }
+
+  onEnded(audio: HTMLAudioElement) {
+    if (this.currentAudio === audio) {
+      this.currentAudio = null;
+    }
+  }  
 
   ngOnInit() {
     console.log("Starting ngOnit()...")
@@ -56,9 +88,9 @@ export class Song {
   constructor(private http: HttpClient) {}
 
   getAudioUrl(filename: string): string {
-  console.log("Starting getAudioUrl", filename);
+    console.log("Starting getAudioUrl", filename);
 
-  return `http://localhost:8080/audio/${filename}`;
+    return `http://localhost:8080/audio/${filename}`;
   }
 
   onFileSelected(event: any) {
