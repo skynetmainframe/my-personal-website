@@ -9,9 +9,11 @@ import java.util.List;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,4 +56,28 @@ public class AudioController {
                 .map(File::getName)
                 .toList();
     }
+
+    // Warning: Right now this allows deleting ANY file on file system.
+    @DeleteMapping("/audio/{filename}")
+    public ResponseEntity<String> deleteAudio(@PathVariable String filename) {
+
+        // by my Assistant
+        // String uploadDir = System.getProperty("user.dir") + "/uploads/";
+
+        File file = new File(UPLOAD_DIR + filename);
+
+        if (!file.exists()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("File not found");
+        }
+
+        boolean deleted = file.delete();
+
+        if (deleted) {
+            return ResponseEntity.ok("File deleted");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Could not delete file");
+        }
+    }    
 }
