@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 public class FileUploadController {
 
     private static final String UPLOAD_DIR = "C:/Programmierung/my-personal-website/backend/uploads/";
@@ -26,6 +26,6 @@ public class FileUploadController {
         file.transferTo(new File(filePath));
 
         // Return URL for playback
-        return "http://localhost:8080/audio/" + file.getOriginalFilename();
+        return "http://192.168.2.114:8080/audio/" + file.getOriginalFilename();
     }
 }
